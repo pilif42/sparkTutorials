@@ -40,9 +40,20 @@ A repo to keep work related to Apache Spark tutorials.
           - cd /home/philippe/Documents/Temp
           - scp -P 2222 root@127.0.0.1:anaconda-ks.cfg anaconda-ks-local.cfg
           - verify that you now have a file called anaconda-ks-local.cfg at /home/philippe/Documents/Temp
-      - Verify the Spash page:
-          - http://127.0.0.1:1080/
-          
+      - Verify the Spash page at http://127.0.0.1:1080/
+      - Ambari dashboard at http://127.0.0.1:8080
+          - reset the admin password:
+              - ssh into the Sandbox
+              - ambari-admin-password-reset
+          - log as admin and explore the metrics, heatmaps, config.
+          - other users:
+              - maria_dev	/ maria_dev
+                raj_ops	/ raj_ops
+                holger_gov / holger_gov
+                amy_ds / amy_ds
+              - differences explained at https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
+      - Start at OPEN A PORT FOR CUSTOM USE
+      
 
 - TODOs in order:
     - https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java
