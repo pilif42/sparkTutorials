@@ -40,7 +40,7 @@ A repo to keep work related to Apache Spark tutorials.
           - cd /home/philippe/Documents/Temp
           - scp -P 2222 root@127.0.0.1:anaconda-ks.cfg anaconda-ks-local.cfg
           - verify that you now have a file called anaconda-ks-local.cfg at /home/philippe/Documents/Temp
-      - Verify the Spash page at http://127.0.0.1:1080/
+      - Verify the Splash page at http://127.0.0.1:1080/
       - Ambari dashboard at http://127.0.0.1:8080
           - reset the admin password:
               - ssh into the Sandbox
@@ -52,9 +52,22 @@ A repo to keep work related to Apache Spark tutorials.
                 holger_gov / holger_gov
                 amy_ds / amy_ds
               - differences explained at https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
-      - Start at OPEN A PORT FOR CUSTOM USE
+      - To figure out the sandbox version:
+          - ssh into Sandbox
+          - sandbox-version
+      - Troubleshoot:
+          - job, query or request that seems to run forever and does not complete:
+                - It may be because it’s in the ACCEPTED state. A good place to begin looking is in the ResourceManager. If you know a job has completed, but the Resource Manager still thinks it’s running – kill it!
+
+
+- https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java
+      - shakespeare.txt:
+            - saved under src/main/resources
+            - uploaded to HDFS:
+                    - http://127.0.0.1:8080/#/login with maria_dev / maria_dev
+                    - mouse over the drop-down menu (blue calculator-style icon) on the upper-right hand corner and click on Files View.
+                    - open the tmp folder and click the upload button in the upper-right corner to upload the file. Make sure it’s named shakespeare.txt.
       
 
-- TODOs in order:
-    - https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java
+- TODOs in order:    
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
