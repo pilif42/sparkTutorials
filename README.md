@@ -47,7 +47,7 @@ A repo to keep work related to Apache Spark tutorials.
               - ambari-admin-password-reset
           - log as admin and explore the metrics, heatmaps, config.
           - other users:
-              - maria_dev	/ maria_dev
+              - maria_dev / maria_dev
                 raj_ops	/ raj_ops
                 holger_gov / holger_gov
                 amy_ds / amy_ds
@@ -67,8 +67,23 @@ A repo to keep work related to Apache Spark tutorials.
                     - http://127.0.0.1:8080/#/login with maria_dev / maria_dev
                     - mouse over the drop-down menu (blue calculator-style icon) on the upper-right hand corner and click on Files View.
                     - open the tmp folder and click the upload button in the upper-right corner to upload the file. Make sure it’s named shakespeare.txt.
-      
+      - to run in the Hortonworks sandbox:
+            - create an assembly jar, ie a single jar file that contains both our code and all jars our code depends on. By packaging our code as an assembly we guarantee that all dependency jars (as defined in pom.xml) will be present when our code runs.
+                    - cd /home/philippe/code/sparkTutorials
+                    - mvn package
+            - copy the assembly jar over to the sandbox:
+                    - cd /home/philippe/code/sparkTutorials/target
+                    - scp -P 2222 SparkTutorial-1.0-SNAPSHOT.jar root@127.0.0.1:/root
+            - submit the app (cmd below is for local mode. Other option = cluster):
+                    - ssh into the sandbox: ssh -p 2222 root@127.0.0.1
+                    - spark-submit --class "hortonworks.sparktutorial.TheApp" --master local ./SparkTutorial-1.0-SNAPSHOT.jar
+            - verify results:
+                    - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
+                    - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
+
 
 - TODOs in order:
+    - add a profile so it is easy to switch local run vs sandbox run
     - add a logger to TheApp
+    - start at DEPLOYING TO THE CLOUD in https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java/
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
