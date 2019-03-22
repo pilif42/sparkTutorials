@@ -69,5 +69,6 @@ A repo to keep work related to Apache Spark tutorials.
                     - open the tmp folder and click the upload button in the upper-right corner to upload the file. Make sure it’s named shakespeare.txt.
       
 
-- TODOs in order:    
+- TODOs in order:
+    - add a logger to TheApp
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
