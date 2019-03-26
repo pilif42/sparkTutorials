@@ -80,10 +80,35 @@ A repo to keep work related to Apache Spark tutorials.
             - verify results:
                     - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
                     - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
+      - to run in the Cloud:
+            - set up a cluster using Hortonworks Cloud Solutions.
+            - deploy your code to the cluster.:
+                    - cd /home/philippe/code/sparkTutorials/target
+                    - scp -P 2222 -i "key.pem" SparkTutorial-1.0-SNAPSHOT.jar root@[ip address of a master node]:root
+            - submit the app:
+                    - ssh -p 2222 -i "key.pem" root@[ip address of a master node]
+                    - spark-submit --class "hortonworks.sparktutorial.TheApp"  --master yarn --deploy-mode client ./SparkTutorial-1.0-SNAPSHOT.jar
+                               - yarn means we want Spark to run in a distributed mode rather than on a single machine, and we want to rely on YARN (a cluster
+                               resource manager) to fetch available machines to run the job. If you aren’t familiar with YARN, it is especially important if you
+                               want to run several jobs simultaneously on the same cluster. When configured properly, a YARN queue will provide different users
+                               or process a quota of cluster resources they’re allowed to use. It also provides mechanisms for allowing a job to take full use
+                               of the cluster when resources are available and scaling existing jobs down when additional users or jobs begin to submit jobs.
+                               - deploy-mode client indicates we want to use the current machine as the driver machine for Spark. The driver machine is a single
+                               machine that initiates a Spark job, and is also where summary results are collected when the job is finished. Alternatively, we
+                               could have specified –deploy-mode cluster, which would have allowed YARN to choose the driver machine. It’s important to note that
+                               a poorly written Spark program can accidentally try to bring back many Terabytes of data to the driver machine, causing it to
+                               crash. For this reason, you shouldn’t use the master node of your cluster as your driver machine. Many organizations submit Spark
+                               jobs from what’s called an edge node, which is a separate machine that isn’t used to store data or perform computation. Since the
+                               edge node is separate from the cluster, it can go down without affecting the rest of the cluster. Edge nodes are also used for
+                               data science work on aggregate data that has been retrieved from the cluster. For example, a data scientist might submit a Spark
+                               job from an edge node to transform a 10 TB dataset into a 1 GB aggregated dataset, and then do analytics on the edge node using
+                               tools like R and Python. If you plan on setting up an edge node, make sure that machine doesn’t have the DataNode or HostManager
+                                components installed, since these are the data storage and compute components of the cluster. You can check this on the host tab
+                                in Ambari.
 
 
 - TODOs in order:
     - add a profile so it is easy to switch local run vs sandbox run
     - add a logger to TheApp
-    - start at DEPLOYING TO THE CLOUD in https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java/
+    - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
