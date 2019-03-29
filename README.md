@@ -74,6 +74,15 @@ A repo to keep work related to Apache Spark tutorials.
             - copy the assembly jar over to the sandbox:
                     - cd /home/philippe/code/sparkTutorials/target
                     - scp -P 2222 SparkTutorial-1.0-SNAPSHOT.jar root@127.0.0.1:/root
+            - delete /tmp/shakespeareWordCount in Ambari:
+                    - this directory is where results are written. As we ssh into the sandbox with root to launch the job, the owner of shakespeareWordCount is root.
+                    - I tried to change the owner of shakespeareWordCount with:
+                            - ssh -p 2222 root@127.0.0.1
+                            - hdfs dfs -chown maria_dev /tmp/shakespeareWordCount
+                            --> chown: changing ownership of '/tmp/shakespeareWordCount': User root is not a super user (non-super user cannot change owner)
+                    - So instead just deleted the directory with:
+                            - ssh -p 2222 root@127.0.0.1
+                            - hdfs dfs -rm -r /tmp/shakespeareWordCount
             - submit the app (cmd below is for local mode. Other option = cluster. Also, note profile=sandbox that is being used in the main of TheApp.):
                     - ssh into the sandbox: ssh -p 2222 root@127.0.0.1
                     - spark-submit --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox' --master local ./SparkTutorial-1.0-SNAPSHOT.jar
@@ -108,7 +117,6 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs in order:
-    - delete tmp/shakespeareWordCount between runs
     - add a logger to TheApp
     - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/

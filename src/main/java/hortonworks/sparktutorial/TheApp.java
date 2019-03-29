@@ -13,8 +13,11 @@ import static java.lang.String.format;
 
 /**
  * To run inside IntelliJ, add the VM option:
- * -Dprofile=local to run locally
- * or -Dprofile=sandbox to run in the Hortonworks sandbox
+ *          -Dprofile=local to run locally
+ *          or -Dprofile=sandbox to run in the Hortonworks sandbox
+ *
+ * Before a local run, verify that directory shakespeareWordCount under /tmp has been deleted.
+ *
  */
 public class TheApp {
     private static final String PROFILE = "profile";
