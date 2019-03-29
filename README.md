@@ -117,6 +117,11 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs in order:
-    - add a logger to TheApp
+    - add a logger to TheApp:
+            - I tried but log statements did not appear:
+                    import org.slf4j.Logger;
+                    import org.slf4j.LoggerFactory;
+                    private static final Logger LOGGER = LoggerFactory.getLogger(TheApp.class);
+
     - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/

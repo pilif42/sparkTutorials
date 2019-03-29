@@ -51,8 +51,8 @@ public class TheApp {
                 .flatMap(s -> Arrays.asList(s.split("[ ,]")).iterator())
                 .mapToPair(word -> new Tuple2<>(word, 1))
                 .reduceByKey((a, b) -> a + b);
-        counts.foreach(p -> System.out.println(p));
-        System.out.println("Total words: " + counts.count());
+        counts.foreach(p -> System.out.println(p)); // TODO Replace with LOGGER
+        System.out.println("Total words: {}" + counts.count()); // TODO Replace with LOGGER
         if (profile.equals(LOCAL)) {
             counts.saveAsTextFile("/tmp/shakespeareWordCount");
         } else if (profile.equals(SANDBOX)) {
