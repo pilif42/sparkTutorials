@@ -5,6 +5,8 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.util.Arrays;
@@ -12,14 +14,20 @@ import java.util.Arrays;
 import static java.lang.String.format;
 
 /**
- * To run inside IntelliJ, add the VM option:
+ * To run this app, add the VM option:
  *          -Dprofile=local to run locally
- *          or -Dprofile=sandbox to run in the Hortonworks sandbox
+ *          or -Dprofile=sandbox to run in the Hortonworks sandbox.
  *
  * Before a local run, verify that directory shakespeareWordCount under /tmp has been deleted.
  *
+ * Note that when running locally, if the logging level (log4j.rootCategory in log4j.properties) is set to DEBUG, then
+ * the word count is NOT happening and you see in the logs: java.io.IOException: HADOOP_HOME or hadoop.home.dir are not set.
+ * Raise it to INFO and everything is OK.
+ *
  */
 public class TheApp {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TheApp.class);
+
     private static final String PROFILE = "profile";
     private static final String LOCAL = "local";
     private static final String SANDBOX = "sandbox";
@@ -27,6 +35,7 @@ public class TheApp {
 
     public static void main(String[] args) {
         String profile = System.getProperty(PROFILE);
+        LOGGER.info("Starting our Spark app with profile {}", profile);
         if (StringUtils.isBlank(profile)) {
             throw new UnsupportedOperationException("profile has to be defined.");
         }
@@ -51,8 +60,8 @@ public class TheApp {
                 .flatMap(s -> Arrays.asList(s.split("[ ,]")).iterator())
                 .mapToPair(word -> new Tuple2<>(word, 1))
                 .reduceByKey((a, b) -> a + b);
-        counts.foreach(p -> System.out.println(p)); // TODO Replace with LOGGER
-        System.out.println("Total words: {}" + counts.count()); // TODO Replace with LOGGER
+        counts.foreach(p -> LOGGER.info(p.toString()));
+        LOGGER.info("Total words: {}", counts.count());
         if (profile.equals(LOCAL)) {
             counts.saveAsTextFile("/tmp/shakespeareWordCount");
         } else if (profile.equals(SANDBOX)) {

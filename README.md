@@ -89,6 +89,8 @@ A repo to keep work related to Apache Spark tutorials.
             - verify results:
                     - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
                     - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
+            - verify logs:
+                    - TODO
       - to run in the Cloud:
             - set up a cluster using Hortonworks Cloud Solutions.
             - deploy your code to the cluster.:
@@ -117,11 +119,7 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs in order:
-    - add a logger to TheApp:
-            - I tried but log statements did not appear:
-                    import org.slf4j.Logger;
-                    import org.slf4j.LoggerFactory;
-                    private static final Logger LOGGER = LoggerFactory.getLogger(TheApp.class);
-
+    - log to console + file locally
+    - where are logs stored in the sandbox
     - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
