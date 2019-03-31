@@ -119,7 +119,6 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs in order:
-    - log to console + file locally
-    - where are logs stored in the sandbox
+    - logs to file in the sandbox: see TODO left in log4j.properties
     - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
