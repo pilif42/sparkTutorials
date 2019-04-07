@@ -72,8 +72,7 @@ A repo to keep work related to Apache Spark tutorials.
                     - cd /home/philippe/code/sparkTutorials
                     - mvn package
             - copy the assembly jar over to the sandbox:
-                    - cd /home/philippe/code/sparkTutorials/target
-                    - scp -P 2222 SparkTutorial-1.0-SNAPSHOT.jar root@127.0.0.1:/root
+                    - scp -P 2222 target/SparkTutorial-1.0-SNAPSHOT.jar root@127.0.0.1:/root
             - delete /tmp/shakespeareWordCount in Ambari:
                     - this directory is where results are written. As we ssh into the sandbox with root to launch the job, the owner of shakespeareWordCount is root.
                     - I tried to change the owner of shakespeareWordCount with:
@@ -85,12 +84,21 @@ A repo to keep work related to Apache Spark tutorials.
                             - hdfs dfs -rm -r /tmp/shakespeareWordCount
             - submit the app (cmd below is for local mode. Other option = cluster. Also, note profile=sandbox that is being used in the main of TheApp.):
                     - ssh into the sandbox: ssh -p 2222 root@127.0.0.1
-                    - spark-submit --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox' --master local ./SparkTutorial-1.0-SNAPSHOT.jar
+                    - spark-submit --verbose --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox' --master local ./SparkTutorial-1.0-SNAPSHOT.jar
             - verify results:
                     - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
                     - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
-            - verify logs:
-                    - TODO
+            - verify logs: TODO
+                    - log4.properties in the sandbox is at /usr/hdp/current/spark2-client/conf
+                    - a tester:
+                                <property>
+                                    <name>spark.driver.extraJavaOption</name>
+                                    <value>-Dlog4j.configuration=/path/to/log4j.properties</value>
+                                </property>
+                                <property>
+                                    <name>spark.executor.extraJavaOptions</name>
+                                    <value>-Dlog4j.configuration=/path/to/log4j.properties</value>
+                                </property>
       - to run in the Cloud:
             - set up a cluster using Hortonworks Cloud Solutions.
             - deploy your code to the cluster.:
