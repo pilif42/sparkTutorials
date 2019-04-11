@@ -82,14 +82,21 @@ A repo to keep work related to Apache Spark tutorials.
                     - So instead just deleted the directory with:
                             - ssh -p 2222 root@127.0.0.1
                             - hdfs dfs -rm -r /tmp/shakespeareWordCount
-            - submit the app (cmd below is for local mode. Other option = cluster. Also, note profile=sandbox that is being used in the main of TheApp.):
+            - submit the app:
+                    - The cmd below is for local mode. Other options = yarn, etc. (for full details: see https://spark.apache.org/docs/latest/submitting-applications.html)
+                            - local mode = Spark runs locally using this computer, rather than in distributed mode.
+                    - Also, note profile=sandbox that is being used in the main of TheApp.
                     - ssh into the sandbox: ssh -p 2222 root@127.0.0.1
+                    - verify that you are under /root
                     - spark-submit --verbose --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox' --master local ./SparkTutorial-1.0-SNAPSHOT.jar
             - verify results:
                     - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
                     - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
             - verify logs: TODO
-                    - log4.properties in the sandbox is at /usr/hdp/current/spark2-client/conf
+                    - log4.properties in the sandbox can be found at:
+                            - /etc/hadoop/conf
+                            - /usr/hdp/current/spark2-client/conf
+                            --> which one is used for our Spark job?
                     - a tester:
                                 <property>
                                     <name>spark.driver.extraJavaOption</name>
@@ -130,3 +137,4 @@ A repo to keep work related to Apache Spark tutorials.
     - logs to file in the sandbox: see TODO left in log4j.properties and TODO above
     - start at LIVE DEBUGGING
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
+    - TODO: play with other modes (master = yarn, etc.) so we have at least 1 driver node, 1 executor node
