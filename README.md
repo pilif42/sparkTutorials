@@ -123,6 +123,21 @@ A repo to keep work related to Apache Spark tutorials.
                                tools like R and Python. If you plan on setting up an edge node, make sure that machine doesn’t have the DataNode or HostManager
                                 components installed, since these are the data storage and compute components of the cluster. You can check this on the host tab
                                 in Ambari.
+      - to debug a remote cluster (ie not running inside the IDE):
+            - on the machine where you plan on submitting your Spark job, run this line from the terminal:
+                   - export SPARK_JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8086
+                   - This lets you attach a debugger at port 8086. You need to make sure port 8086 is able to receive inbound connections.
+                   - with the Hortonworks sandbox:
+                        - ssh onto it and run the command.
+                        - TODO Error running 'TheAppRemotelyDebugged': Unable to open debugger port (127.0.0.1:8086): java.io.IOException "handshake failed - connection prematurally closed"
+            - in IntelliJ, go to Run > Edit Configurations:
+                   - click the + button at the upper-left and add a new Remote configuration.
+                   - name = TheAppRemotelyDebugged
+                   - host = 127.0.0.1 (IP of the sandbox)
+                   - port = 8086
+                   - Apply
+                   - Add a breakpoint in TheApp.java
+                   - run this debug conf from your IDE immediately after submitting your Spark job. The debugger will attach and Spark will stop at breakpoints.
 
 
 - Notes on logging:
@@ -144,7 +159,8 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs in order:
-    - start at LIVE DEBUGGING
+    - start at LIVE DEBUGGING: port to be open as per 'OPEN A PORT FOR CUSTOM USE' in https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
     - find a diagram showing edge node - driver node - executor nodes
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
     - TODO: play with other modes (master = yarn, etc.) so we have at least 1 driver node, 1 executor node
+    - TODO: app which reads 2 Kafka streams, compares them and publishes results to Kafka or HDFS.
