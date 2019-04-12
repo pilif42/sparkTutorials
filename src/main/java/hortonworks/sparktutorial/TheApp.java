@@ -19,11 +19,6 @@ import static java.lang.String.format;
  *          or -Dprofile=sandbox to run in the Hortonworks sandbox.
  *
  * Before a local run, verify that directory shakespeareWordCount under /tmp has been deleted.
- *
- * Note that when running locally, if the logging level (log4j.rootCategory in log4j.properties) is set to DEBUG, then
- * the word count is NOT happening and you see in the logs: java.io.IOException: HADOOP_HOME or hadoop.home.dir are not set.
- * Raise it to INFO and everything is OK.
- *
  */
 public class TheApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(TheApp.class);

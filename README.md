@@ -71,6 +71,9 @@ A repo to keep work related to Apache Spark tutorials.
             - create an assembly jar, ie a single jar file that contains both our code and all jars our code depends on. By packaging our code as an assembly we guarantee that all dependency jars (as defined in pom.xml) will be present when our code runs.
                     - cd /home/philippe/code/sparkTutorials
                     - mvn package
+            - copy the log4j.properties over to the sandbox:
+                    - cd /home/philippe/code/sparkTutorials
+                    - scp -P 2222 env/sandbox/log4j.properties root@127.0.0.1:/root
             - copy the assembly jar over to the sandbox:
                     - scp -P 2222 target/SparkTutorial-1.0-SNAPSHOT.jar root@127.0.0.1:/root
             - delete /tmp/shakespeareWordCount in Ambari:
@@ -83,29 +86,18 @@ A repo to keep work related to Apache Spark tutorials.
                             - ssh -p 2222 root@127.0.0.1
                             - hdfs dfs -rm -r /tmp/shakespeareWordCount
             - submit the app:
-                    - The cmd below is for local mode. Other options = yarn, etc. (for full details: see https://spark.apache.org/docs/latest/submitting-applications.html)
-                            - local mode = Spark runs locally using this computer, rather than in distributed mode.
-                    - Also, note profile=sandbox that is being used in the main of TheApp.
+                    - notes:
+                            - The cmd below is for local mode. Other options = yarn, etc. (for full details: see https://spark.apache.org/docs/latest/submitting-applications.html)
+                                    - local mode = Spark runs locally using this computer, rather than in distributed mode.
+                            - Also, note profile=sandbox that is being used in the main of TheApp.
+                            - And the logging config explained further in 'Notes on logging' below.
                     - ssh into the sandbox: ssh -p 2222 root@127.0.0.1
                     - verify that you are under /root
-                    - spark-submit --verbose --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox' --master local ./SparkTutorial-1.0-SNAPSHOT.jar
+                    - spark-submit --verbose --master local --class "hortonworks.sparktutorial.TheApp" --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox -Dlog4j.configuration=file:/root/log4j.properties -Dvm.logging.name=myapp -Dvm.logging.level=DEBUG' --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/root/log4j.properties -Dvm.logging.name=myapp -Dvm.logging.level=DEBUG" ./SparkTutorial-1.0-SNAPSHOT.jar
             - verify results:
                     - open Ambari at http://127.0.0.1:8080 with maria_dev / maria_dev
                     - menu Files View --> /tmp --> you will find a directory shakespeareWordCount.
-            - verify logs: TODO
-                    - log4.properties in the sandbox can be found at:
-                            - /etc/hadoop/conf
-                            - /usr/hdp/current/spark2-client/conf
-                            --> which one is used for our Spark job?
-                    - a tester:
-                                <property>
-                                    <name>spark.driver.extraJavaOption</name>
-                                    <value>-Dlog4j.configuration=/path/to/log4j.properties</value>
-                                </property>
-                                <property>
-                                    <name>spark.executor.extraJavaOptions</name>
-                                    <value>-Dlog4j.configuration=/path/to/log4j.properties</value>
-                                </property>
+            - verify logs in /var/log/spark/myapp.log: see 'Notes on logging' below.
       - to run in the Cloud:
             - set up a cluster using Hortonworks Cloud Solutions.
             - deploy your code to the cluster.:
@@ -133,8 +125,26 @@ A repo to keep work related to Apache Spark tutorials.
                                 in Ambari.
 
 
+- Notes on logging:
+      - when running locally on my laptop, log4j.properties under /src/main/resources is used. Hence, logs are found at /tmp/sparkTutorialLog.out.
+                - Note that when running locally, if the logging level (log4j.rootCategory in log4j.properties) is set to DEBUG, then the word count is NOT happening and you see in the logs:
+                java.io.IOException: HADOOP_HOME or hadoop.home.dir are not set. Raise it to INFO and everything is OK.
+      - when running in the Hortonworks sandbox in Standalone mode:
+                - we copy /env/sandbox/log4j.properties from laptop to sandbox under /root
+                - Spark driver is running on the machine where you submit the job, and each Spark worker node will run an executor for this job. So, you need to setup log4j for both driver and executor as per the command below.
+                --conf 'spark.driver.extraJavaOptions=-Dprofile=sandbox -Dlog4j.configuration=file:/root/log4j.properties -Dvm.logging.name=myapp -Dvm.logging.level=DEBUG' --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/root/log4j.properties -Dvm.logging.name=myapp -Dvm.logging.level=DEBUG"
+      - when running on YARN:
+                - both driver and executor use the same configuration file. That is because in yarn-cluster mode, driver is also run as a container in YARN.
+                - an example of command is:
+                        spark-submit
+                        --master yarn-cluster
+                        --files /path/to/log4j-spark.properties
+                        --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=log4j-spark.properties"
+                        --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=log4j-spark.properties"
+
+
 - TODOs in order:
-    - logs to file in the sandbox: see TODO left in log4j.properties and TODO above
     - start at LIVE DEBUGGING
+    - find a diagram showing edge node - driver node - executor nodes
     - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
     - TODO: play with other modes (master = yarn, etc.) so we have at least 1 driver node, 1 executor node
