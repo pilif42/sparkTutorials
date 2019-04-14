@@ -2,6 +2,16 @@
 A repo to keep work related to Apache Spark tutorials.
 
 
+- A few definitions:
+      - an edge node = interface between the outside network and the Hadoop cluster. For this reason, it is sometimes referred to as a gateway node.
+            - used to run client applications: you submit your Storm topologies and Spark jobs from it.
+            - used to run cluster administration tools: Ambari, Sqoop, etc.
+            - good definition at https://www.dummies.com/programming/big-data/hadoop/edge-nodes-in-hadoop-clusters/
+      - a Spark Driver node and a Spark Worker node:
+            - good definition at https://spark.apache.org/docs/latest/cluster-overview.html
+            - see the importance of the value chosen for --deploy-mode (in the spark-submit) below.
+
+
 - Installed the HDP Sandbox for Docker following https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
       - copied HDP_3.0.1_docker-deploy-scripts_18120587fc7fb to /home/philippe
       - cd /home/philippe/HDP_3.0.1_docker-deploy-scripts
@@ -24,6 +34,7 @@ A repo to keep work related to Apache Spark tutorials.
       - pour supprimer l'image:
           - d'abord supprimer le conteneur
           - sudo docker rmi hortonworks/sandbox-hdp:3.0.1
+      - architecture explained with /docs/sandboxArchitecture.jpg taken from https://fr.hortonworks.com/tutorial/sandbox-architecture/
 
 
 - Finalised set up following https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
@@ -124,12 +135,11 @@ A repo to keep work related to Apache Spark tutorials.
                                 components installed, since these are the data storage and compute components of the cluster. You can check this on the host tab
                                 in Ambari.
       - to debug a remote cluster (ie not running inside the IDE):
-            - on the machine where you plan on submitting your Spark job, run this line from the terminal:
+            - on the machine where you submit your Spark job, run this command from the terminal:
                    - export SPARK_JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8086
                    - This lets you attach a debugger at port 8086. You need to make sure port 8086 is able to receive inbound connections.
                    - with the Hortonworks sandbox:
                         - ssh onto it and run the command.
-                        - TODO Error running 'TheAppRemotelyDebugged': Unable to open debugger port (127.0.0.1:8086): java.io.IOException "handshake failed - connection prematurally closed"
             - in IntelliJ, go to Run > Edit Configurations:
                    - click the + button at the upper-left and add a new Remote configuration.
                    - name = TheAppRemotelyDebugged
@@ -138,6 +148,7 @@ A repo to keep work related to Apache Spark tutorials.
                    - Apply
                    - Add a breakpoint in TheApp.java
                    - run this debug conf from your IDE immediately after submitting your Spark job. The debugger will attach and Spark will stop at breakpoints.
+                        - TODO with our sandbox as getting: Error running 'TheAppRemotelyDebugged': Unable to open debugger port (127.0.0.1:8086): java.io.IOException "handshake failed - connection prematurally closed"
 
 
 - Notes on logging:
@@ -158,9 +169,6 @@ A repo to keep work related to Apache Spark tutorials.
                         --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=log4j-spark.properties"
 
 
-- TODOs in order:
-    - start at LIVE DEBUGGING: port to be open as per 'OPEN A PORT FOR CUSTOM USE' in https://fr.hortonworks.com/tutorial/learning-the-ropes-of-the-hortonworks-sandbox/
-    - find a diagram showing edge node - driver node - executor nodes
-    - https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/
-    - TODO: play with other modes (master = yarn, etc.) so we have at least 1 driver node, 1 executor node
-    - TODO: app which reads 2 Kafka streams, compares them and publishes results to Kafka or HDFS.
+- TODOs:
+    - TODO https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/section/1/
+    - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
