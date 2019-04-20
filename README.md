@@ -171,6 +171,7 @@ A repo to keep work related to Apache Spark tutorials.
 
 - TODOs:
     - TODO https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/section/1/
+            - TODO Start at CONCEPT: HIVE AND PIG
     - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
           - try with spark.streaming.DStream
           - try with structured streaming
