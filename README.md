@@ -288,6 +288,7 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs:
+    - TODO: verify u can publish to the Kafka embedded in the Sandbox.
     - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
           - try with spark.streaming.DStream
           - try with structured streaming
