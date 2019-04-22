@@ -143,7 +143,7 @@ A repo to keep work related to Apache Spark tutorials.
             - in IntelliJ, go to Run > Edit Configurations:
                    - click the + button at the upper-left and add a new Remote configuration.
                    - name = TheAppRemotelyDebugged
-                   - host = 127.0.0.1 (IP of the sandbox)
+                   - host = 127.0.0.1 (IP of the SandBox)
                    - port = 8086
                    - Apply
                    - Add a breakpoint in TheApp.java
@@ -169,9 +169,125 @@ A repo to keep work related to Apache Spark tutorials.
                         --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=log4j-spark.properties"
 
 
+- https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/section/1/
+      - Beeline (command shell to connect to Hive):
+            - ssh into the SandBox with: ssh -p 2222 root@127.0.0.1
+            - connect to Beeline Hive with: beeline -u jdbc:hive2://127.0.0.1:10000 -n hive
+            - grant all permission access for maria_dev user with:
+                        grant all on database foodmart to user maria_dev;
+                        grant all on database default to user maria_dev;
+            - exit the Beeline shell: !quit
+            - connect to Beeline using maria_dev with: beeline -u jdbc:hive2://127.0.0.1:10000 -n maria_dev
+            - test the following commands:
+                        select * from foodmart.customer limit 10;
+                        select * from foodmart.account limit 10;
+                        select * from trucks;
+                        show tables;
+                        !help
+                        !tables
+                        !describe trucks
+            - Running hive queries from the Beeline shell is much faster than through the DAS (Data Analytics Studio) UI.
+                        because Hive runs the query directory in hadoop whereas in DAS, the query must be accepted by a rest server before it can submitted to hadoop.
+
+      - Analyse the truck data:
+            - In DAS, select 'Compose' and execute:
+                    - CREATE TABLE truckmileage STORED AS ORC AS SELECT truckid, driverid, rdate, miles, gas, miles / gas mpg FROM trucks LATERAL VIEW stack(54, 'jun13',jun13_miles,jun13_gas,'may13',may13_miles,may13_gas,'apr13',apr13_miles,apr13_gas,'mar13',mar13_miles,mar13_gas,'feb13',feb13_miles,feb13_gas,'jan13',jan13_miles,jan13_gas,'dec12',dec12_miles,dec12_gas,'nov12',nov12_miles,nov12_gas,'oct12',oct12_miles,oct12_gas,'sep12',sep12_miles,sep12_gas,'aug12',aug12_miles,aug12_gas,'jul12',jul12_miles,jul12_gas,'jun12',jun12_miles,jun12_gas,'may12',may12_miles,may12_gas,'apr12',apr12_miles,apr12_gas,'mar12',mar12_miles,mar12_gas,'feb12',feb12_miles,feb12_gas,'jan12',jan12_miles,jan12_gas,'dec11',dec11_miles,dec11_gas,'nov11',nov11_miles,nov11_gas,'oct11',oct11_miles,oct11_gas,'sep11',sep11_miles,sep11_gas,'aug11',aug11_miles,aug11_gas,'jul11',jul11_miles,jul11_gas,'jun11',jun11_miles,jun11_gas,'may11',may11_miles,may11_gas,'apr11',apr11_miles,apr11_gas,'mar11',mar11_miles,mar11_gas,'feb11',feb11_miles,feb11_gas,'jan11',jan11_miles,jan11_gas,'dec10',dec10_miles,dec10_gas,'nov10',nov10_miles,nov10_gas,'oct10',oct10_miles,oct10_gas,'sep10',sep10_miles,sep10_gas,'aug10',aug10_miles,aug10_gas,'jul10',jul10_miles,jul10_gas,'jun10',jun10_miles,jun10_gas,'may10',may10_miles,may10_gas,'apr10',apr10_miles,apr10_gas,'mar10',mar10_miles,mar10_gas,'feb10',feb10_miles,feb10_gas,'jan10',jan10_miles,jan10_gas,'dec09',dec09_miles,dec09_gas,'nov09',nov09_miles,nov09_gas,'oct09',oct09_miles,oct09_gas,'sep09',sep09_miles,sep09_gas,'aug09',aug09_miles,aug09_gas,'jul09',jul09_miles,jul09_gas,'jun09',jun09_miles,jun09_gas,'may09',may09_miles,may09_gas,'apr09',apr09_miles,apr09_gas,'mar09',mar09_miles,mar09_gas,'feb09',feb09_miles,feb09_gas,'jan09',jan09_miles,jan09_gas ) dummyalias AS rdate, miles, gas;
+                    - select * from truckmileage limit 100;
+                    - SELECT truckid, avg(mpg) avgmpg FROM truckmileage GROUP BY truckid;
+            - Note that you can:
+                    - 'Save as' queries for future re-use.
+                    - Save results of a query into a table so the result set becomes persistent:
+                            - CREATE TABLE avgmileage STORED AS ORC AS SELECT truckid, avg(mpg) avgmpg FROM truckmileage GROUP BY truckid;
+                            - SELECT * FROM avgmileage LIMIT 100;
+                            - CREATE TABLE DriverMileage STORED AS ORC AS SELECT driverid, sum(miles) totmiles FROM truckmileage GROUP BY driverid;
+                            - SELECT * FROM drivermileage;
+                                    - store our results onto HDFS:
+                                            - click on 'Export data' in the top right0hand corner
+                                            - click on 'Save to HDFS'
+                                            - store it at /tmp/data/drivermileage
+
+      - Use Spark to compute the risk associated with each driver (The Sandbox includes Spark 2.3.1.):
+            - check that Spark2 and Zeppelin Notebook are running:
+                    - Log onto the Ambari Dashboard as maria_dev.
+                    - At the bottom left corner of the services column, check that Spark2 and Zeppelin Notebook are running.
+            - create a Zeppelin Notebook:
+                    - Access the Zeppelin interface at http://127.0.0.1:9995/
+                    - Click on a Notebook tab in the top left corner and select Create new note. Name your notebook: Compute Risk factor with Spark
+            - create a Hive context:
+                    - Copy the below in the notebook:
+                            %spark2
+                            val hiveContext = new org.apache.spark.sql.SparkSession.Builder().getOrCreate()
+                    - Press 'Run this paragraph'.
+            - use lines below to import .csv data into a data frame without a user defined schema:
+                    /**
+                     * Let us first see what temporary views already exist on our Sandbox
+                     */
+                    - hiveContext.sql("SHOW TABLES").show()
+                    - val geoLocationDataFrame = spark.read.format("csv").option("header", "true").load("hdfs:///tmp/data/geolocation.csv")
+                    /**
+                     * Now that we have the data loaded into a DataFrame, we can register a temporary view.
+                     */
+                    - geoLocationDataFrame.createOrReplaceTempView("geolocation")
+                    - hiveContext.sql("SELECT * FROM geolocation LIMIT 15").show()
+                    - hiveContext.sql("DESCRIBE geolocation").show()
+            - use lines below to import .csv data into a data frame with a user defined schema:
+                    /**
+                     * The SQL Types library allows us to define the data types of our schema
+                     */
+                    - import org.apache.spark.sql.types._
+                    /**
+                     * Recall from the previous tutorial section that the driverid schema only has two relations:
+                     * driverid (a String), and totmiles (a Double).
+                     */
+                    - val drivermileageSchema = new StructType().add("driverid",StringType,true).add("totmiles",DoubleType,true)
+                    /**
+                    * Now we can populate drivermileageSchema with our CSV files residing in HDFS
+                    */
+                    - val drivermileageDataFrame = spark.read.format("csv").option("header", "true").schema(drivermileageSchema)load("hdfs:///tmp/data/drivermileage.csv")
+                    /**
+                    * Finally, let’s create a temporary view
+                    */
+                    - drivermileageDataFrame.createOrReplaceTempView("drivermileage")
+                    /**
+                    * We can use SparkSession and SQL to query drivermileage
+                    */
+                    - hiveContext.sql("SELECT * FROM drivermileage LIMIT 15").show()
+            - use lines below to build RDDs:
+                    val geolocation_temp0 = hiveContext.sql("SELECT * FROM geolocation")
+                    geolocation_temp0.createOrReplaceTempView("geolocation_temp0")
+
+                    val drivermileage_temp0 = hiveContext.sql("SELECT * FROM drivermileage")
+                    drivermileage_temp0.createOrReplaceTempView("drivermileage_temp0")
+
+                    /**
+                    * SELECT operation is a RDD transformation and therefore does not return anything.
+                    */
+                    val geolocation_temp1 = hiveContext.sql("SELECT driverid, COUNT(driverid) occurance from geolocation_temp0 WHERE event!='normal' GROUP BY driverid")
+                    geolocation_temp1.show(10) --> does NOT show anything so you have to do the below to see results.
+                    geolocation_temp1.createOrReplaceTempView("geolocation_temp1")
+                    hiveContext.sql("SELECT * FROM geolocation_temp1 LIMIT 15").show()
+
+                    /**
+                    * JOIN example
+                    */
+                    val joined = hiveContext.sql("select a.driverid,a.occurance,b.totmiles from geolocation_temp1 a,drivermileage_temp0 b where a.driverid=b.driverid")
+                    joined.createOrReplaceTempView("joined")
+                    hiveContext.sql("SELECT * FROM joined LIMIT 10").show()
+
+                    /**
+                    * Compute risk factor
+                    */
+                    val risk_factor_spark = hiveContext.sql("SELECT driverid, occurance, totmiles, totmiles/occurance riskfactor FROM joined")
+                    risk_factor_spark.createOrReplaceTempView("risk_factor_spark")
+                    hiveContext.sql("SELECT * FROM risk_factor_spark LIMIT 15").show()
+
+                    /**
+                    * Save results as a .csv on HDFS: There will be a directory structure with our data under user/maria_dev/data/ named riskfactor. There, we can find our csv file with a Spark auto-generated name.
+                    */
+                    risk_factor_spark.coalesce(1).write.csv("hdfs:///tmp/data/riskfactor")
+
+
 - TODOs:
-    - TODO https://fr.hortonworks.com/tutorial/hadoop-tutorial-getting-started-with-hdp/section/1/
-            - TODO Start at CONCEPT: HIVE AND PIG
     - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
           - try with spark.streaming.DStream
           - try with structured streaming
