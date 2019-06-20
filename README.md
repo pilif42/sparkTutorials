@@ -71,6 +71,21 @@ A repo to keep work related to Apache Spark tutorials.
                 - It may be because it’s in the ACCEPTED state. A good place to begin looking is in the ResourceManager. If you know a job has completed, but the Resource Manager still thinks it’s running – kill it!
 
 
+- Kafka setup:
+      - to list all existing topics:
+            - ssh into the sandbox
+            - cd /usr/hdp/current/kafka-broker/bin
+            - ./kafka-topics.sh --list --zookeeper localhost:2181
+      - to create a topic called notifications:
+            - ./kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic notifications
+      - to consume from topic notifications:
+            - old way = ./kafka-console-consumer.sh --zookeeper localhost:2181 --topic notifications
+                    - consumes OK but msg: Consider using the new consumer by passing [bootstrap-server] instead of [zookeeper].
+            - new way = ./kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic notifications
+                    - does NOT consume and error = WARN [Consumer clientId=consumer-1, groupId=console-consumer-26702] Connection to node -1 could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
+      - Kafka logs located at /usr/hdp/current/kafka-broker/logs
+
+
 - https://fr.hortonworks.com/tutorial/setting-up-a-spark-development-environment-with-java
       - shakespeare.txt:
             - saved under src/main/resources
@@ -288,7 +303,7 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs:
-    - TODO: verify u can publish notifications (truck exceeding speed limit) to the Kafka server in the Sandbox.
+    - TODO: publish notifications (truck exceeding speed limit) to the Kafka server in the Sandbox.
     - TODO: build a Spark app which reads these notifications, aggregates them over a 24-hr period and raises an alert (SMS, email or ?) if more than 3 notifs for the same truck. Check https://www.baeldung.com/kafka-spark-data-pipeline.
     - TODO: Persist in Hive or better location notifs read from Kafka so the business can create reports using https://www.tableau.com or similar tool.
     - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
