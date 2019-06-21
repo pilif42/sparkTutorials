@@ -303,9 +303,8 @@ A repo to keep work related to Apache Spark tutorials.
 
 
 - TODOs:
-    - TODO: publish notifications (truck exceeding speed limit) to the Kafka server in the Sandbox.
-    - TODO: build a Spark app which reads these notifications, aggregates them over a 24-hr period and raises an alert (SMS, email or ?) if more than 3 notifs for the same truck. Check https://www.baeldung.com/kafka-spark-data-pipeline.
-    - TODO: Persist in Hive or better location notifs read from Kafka so the business can create reports using https://www.tableau.com or similar tool.
-    - TODO: build a Spark app which reads 2 Kafka streams (1 containing Acks, 1 containing Events), compares them and publishes results to Kafka or HDFS.
+    - TODO: build a Spark app which reads these notifications, persists them in Hive, Cassandra, MariaDB or? so the business can create reports using https://www.tableau.com or similar tool.
+    - TODO: build a Spark app which reads these events, aggregates them over a 24-hr period and raises an alert (SMS, email or ?) if more than 3 speeding events for the same truck. Check https://www.baeldung.com/kafka-spark-data-pipeline.
+    - TODO: build a Spark app which reads 2 Kafka streams (1 containing Events, 1 containing itemsToDeliver), compares them and publishes notifications to Kafka if an item has not been delivered.
           - try with spark.streaming.DStream
           - try with structured streaming
